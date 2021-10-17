@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "699970456245",
+    "project_id": "trash-finder-927f7",
+    "storage_bucket": "trash-finder-927f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:699970456245:android:19fba8e388726f8b690cfc",
+        "android_client_info": {
+          "package_name": "com.trash.finder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "699970456245-8k7t2od18pm40j79bu4fq8digbjqvp9f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_syQugJBMQs2np7uv7wwMzklGgQhE_Sg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "699970456245-8k7t2od18pm40j79bu4fq8digbjqvp9f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

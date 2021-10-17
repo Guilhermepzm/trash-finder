@@ -1,4 +1,4 @@
-package com.example.trash_finder
+package com.trash.finder
 
 import io.flutter.embedding.android.FlutterActivity
 

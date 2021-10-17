@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.trash_finder">
+    package="com.trash.finder">
    <application
         android:label="trash_finder"
         android:icon="@mipmap/ic_launcher">
