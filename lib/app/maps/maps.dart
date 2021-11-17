@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:location/location.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -10,23 +11,67 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
-  Completer<GoogleMapController> _controller = Completer();
+  late GoogleMapController _controller;
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(-20.7728634418908, -49.33278092409924),
-    zoom: 17,
-  );
+
+  late LocationData _currentPosition;
+  Location location = Location();
+
+  getLoc() async {
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    _currentPosition = await location.getLocation();
+    location.onLocationChanged.listen((LocationData currentLocation) {
+      setState(() {
+        _currentPosition = currentLocation;
+       
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLoc();
+  }
+
+  void _onMapCreated(GoogleMapController _cntlr) {
+    _controller = _controller;
+    location.onLocationChanged.listen((l) {
+      _controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: LatLng(l.latitude ?? 0, l.longitude ?? 0), zoom: 15),
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
-      mapType: MapType.normal,
-      zoomControlsEnabled: false,
-      myLocationEnabled: true,
-      initialCameraPosition: _kGooglePlex,
-      onMapCreated: (GoogleMapController controller) {
-        _controller.complete(controller);
-      },
-    );
+        mapType: MapType.normal,
+        myLocationEnabled: true,
+        initialCameraPosition:
+            CameraPosition(target: LatLng(
+            _currentPosition.latitude ?? 0, _currentPosition.longitude ?? 0), zoom: 15),
+        onMapCreated: _onMapCreated);
   }
 }
