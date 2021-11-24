@@ -15,7 +15,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   var _formKey = GlobalKey<FormState>();
 
-  String? nome, email, senha, apelido;
+  String? nome, email, senha, telefone, dataNasc;
 
   Future _register(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
@@ -28,10 +28,11 @@ class _RegisterPageState extends State<RegisterPage> {
         await auth.currentUser?.updateDisplayName(nome);
 
         // Adiciona o apelido no firestore (database):
-        firestore
-            .collection('users')
-            .doc(auth.currentUser?.uid)
-            .set({'apelido': apelido, 'data': DateTime.now()});
+        firestore.collection('users').doc(auth.currentUser?.uid).set({
+          'telefone': telefone,
+          'dataNasc': dataNasc,
+          'data': DateTime.now()
+        });
 
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => HomePage()), (route) => false);
@@ -63,6 +64,18 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               TextFormField(
                 decoration: InputDecoration(
+                  labelText: "Telefone",
+                ),
+                onSaved: (value) => telefone = value,
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Data de nascimento",
+                ),
+                onSaved: (value) => dataNasc = value,
+              ),
+              TextFormField(
+                decoration: InputDecoration(
                   labelText: "E-mail",
                 ),
                 onSaved: (value) => email = value,
@@ -78,12 +91,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     return "Senha deve conter no mínimo 6 caracteres";
                   return null;
                 },
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: "Apelido",
-                ),
-                onSaved: (value) => apelido = value,
               ),
               SizedBox(
                 height: 20,

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:location/location.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,9 +12,9 @@ class MapsPage extends StatefulWidget {
 class _MapsPageState extends State<MapsPage> {
   late GoogleMapController _controller;
 
-
   late LocationData _currentPosition;
   Location location = Location();
+  bool _loading = true;
 
   getLoc() async {
     bool _serviceEnabled;
@@ -40,7 +39,7 @@ class _MapsPageState extends State<MapsPage> {
     location.onLocationChanged.listen((LocationData currentLocation) {
       setState(() {
         _currentPosition = currentLocation;
-       
+        _loading = false;
       });
     });
   }
@@ -66,12 +65,16 @@ class _MapsPageState extends State<MapsPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return Center(child: Text("Loading"));
+    }
     return GoogleMap(
         mapType: MapType.normal,
         myLocationEnabled: true,
-        initialCameraPosition:
-            CameraPosition(target: LatLng(
-            _currentPosition.latitude ?? 0, _currentPosition.longitude ?? 0), zoom: 15),
+        initialCameraPosition: CameraPosition(
+            target: LatLng(_currentPosition.latitude ?? 0,
+                _currentPosition.longitude ?? 0),
+            zoom: 15),
         onMapCreated: _onMapCreated);
   }
 }

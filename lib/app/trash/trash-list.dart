@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class TrashListPage extends StatefulWidget {
   @override
@@ -28,48 +29,79 @@ class _TrashListPageState extends State<TrashListPage> {
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return Text('Something went wrong');
+              return Align(
+                alignment: Alignment.center,
+                child: Center(child: Text("Something went wrong")),
+              );
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Loading");
+              return Align(
+                alignment: Alignment.center,
+                child: Center(child: Text("Loading")),
+              );
             }
 
-            return ListView(
-              children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                Map<String, dynamic> data =
-                    document.data()! as Map<String, dynamic>;
-                return Card(
-                  shadowColor: Colors.green[400],
-                  margin: new EdgeInsets.only(bottom: 20),
-                  child: InkWell(
-                    splashColor: Colors.green[400],
-                    onTap: () {
-                      print(data);
-                    },
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(
-                              CupertinoIcons.trash_fill,
-                              color: Colors.green[400],
-                              size: 36,
-                            ),
-                            title: _trashTitles[data['type']],
-                            subtitle: Text(
-                              data['description'],
-                              style: TextStyle(
-                                  color: Colors.black.withOpacity(0.6)),
-                            ),
+            var list = Future.wait(snapshot.data!.docs.map((e) async {
+              Map<String, dynamic> data = e.data()! as Map<String, dynamic>;
+              await Geolocator.getCurrentPosition().then((value) {
+                data['distance'] = Geolocator.distanceBetween(
+                    value.latitude, value.longitude, data['lat'], data['long']);
+              });
+              return data;
+            }).toList());
+
+            return FutureBuilder(
+              builder: (context, projectSnap) {
+                if (projectSnap.data == null) {
+                  //print('project snapshot data is: ${projectSnap.data}');
+                  return Align(
+                    alignment: Alignment.center,
+                    child: Center(child: Text("Loading")),
+                  );
+                }
+                var temp = projectSnap.data as List;
+
+                return ListView.builder(
+                  itemCount: temp.length,
+                  itemBuilder: (context, index) {
+                    var temp = projectSnap.data as List;
+                    temp.sort((a, b) => a['distance'].compareTo(b['distance']));
+                    var data = temp[index];
+                    return Card(
+                      shadowColor: Colors.green[400],
+                      margin: new EdgeInsets.only(bottom: 20),
+                      child: InkWell(
+                        splashColor: Colors.green[400],
+                        onTap: () {
+                          print(data);
+                        },
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              ListTile(
+                                leading: Icon(
+                                  CupertinoIcons.trash_fill,
+                                  color: Colors.green[400],
+                                  size: 36,
+                                ),
+                                title: _trashTitles[data['type']],
+                                subtitle: Text(
+                                  data['description'],
+                                  style: TextStyle(
+                                      color: Colors.black.withOpacity(0.6)),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 );
-              }).toList(),
+              },
+              future: list,
             );
           },
         ),
