@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:maps_launcher/maps_launcher.dart';
+import 'package:trash_finder/app/trash/details.dart';
 
 class TrashListPage extends StatefulWidget {
   @override
@@ -38,7 +40,10 @@ class _TrashListPageState extends State<TrashListPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Align(
                 alignment: Alignment.center,
-                child: Center(child: Text("Loading")),
+                child: Center(
+                    child: CupertinoActivityIndicator(
+                  radius: 20,
+                )),
               );
             }
 
@@ -57,7 +62,10 @@ class _TrashListPageState extends State<TrashListPage> {
                   //print('project snapshot data is: ${projectSnap.data}');
                   return Align(
                     alignment: Alignment.center,
-                    child: Center(child: Text("Loading")),
+                    child: Center(
+                        child: CupertinoActivityIndicator(
+                      radius: 20,
+                    )),
                   );
                 }
                 var temp = projectSnap.data as List;
@@ -73,8 +81,15 @@ class _TrashListPageState extends State<TrashListPage> {
                       margin: new EdgeInsets.only(bottom: 20),
                       child: InkWell(
                         splashColor: Colors.green[400],
+                        onLongPress: () {
+                          MapsLauncher.launchCoordinates(
+                              data['lat'], data['long']);
+                        },
                         onTap: () {
-                          print(data);
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => TrashDetailsPage(
+                                    trash: data,
+                                  )));
                         },
                         child: SizedBox(
                           width: double.infinity,
@@ -87,10 +102,27 @@ class _TrashListPageState extends State<TrashListPage> {
                                   size: 36,
                                 ),
                                 title: _trashTitles[data['type']],
-                                subtitle: Text(
-                                  data['description'],
-                                  style: TextStyle(
-                                      color: Colors.black.withOpacity(0.6)),
+                                subtitle: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        data['description'],
+                                        maxLines: 2,
+                                        style: TextStyle(
+                                            color:
+                                                Colors.black.withOpacity(0.6)),
+                                      ),
+                                    ),
+                                    Text(
+                                      (data['distance'] / 1000)
+                                              .toStringAsFixed(1) +
+                                          ' km',
+                                      style: TextStyle(
+                                          color: Colors.black.withOpacity(0.6)),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],

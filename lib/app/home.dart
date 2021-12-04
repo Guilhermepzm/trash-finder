@@ -3,7 +3,7 @@ import 'package:trash_finder/app/configurations/configurations.dart';
 import 'package:trash_finder/app/maps/maps.dart';
 import 'package:flutter/material.dart';
 import 'package:trash_finder/app/trash/add-button.dart';
-import 'package:trash_finder/app/trash/trash-list.dart';
+import 'package:trash_finder/app/trash/list.dart';
 
 class HomePage extends StatefulWidget {
   @override

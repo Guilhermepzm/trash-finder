@@ -66,7 +66,10 @@ class _MapsPageState extends State<MapsPage> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return Center(child: Text("Loading"));
+      return Center(
+          child: CupertinoActivityIndicator(
+        radius: 20,
+      ));
     }
     return GoogleMap(
         mapType: MapType.normal,
