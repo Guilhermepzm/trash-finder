@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:trash_finder/app/configurations/configurations.dart';
 import 'package:trash_finder/app/maps/maps.dart';
 import 'package:flutter/material.dart';
 import 'package:trash_finder/app/trash/add-button.dart';
 import 'package:trash_finder/app/trash/list.dart';
+import 'package:trash_finder/auth/login.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,10 +13,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final FirebaseAuth auth = FirebaseAuth.instance;
   int _selectedIndex = 1;
+
+  Future _logout(BuildContext context) async {
+    await auth.signOut();
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => LoginPage()), (route) => false);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
+      if (index == 2) {
+        _logout(context);
+        return;
+      }
       _selectedIndex = index;
     });
   }
@@ -60,8 +73,8 @@ class _HomePageState extends State<HomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.gear_solid),
-            label: 'Configurações',
+            icon: Icon(Icons.logout),
+            label: 'Sair',
           ),
         ],
         currentIndex: _selectedIndex,
